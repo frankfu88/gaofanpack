@@ -1,13 +1,13 @@
 "use client"; // ✅ 讓整個檔案變成 Client Component
 
-import { usePathname } from "next/navigation"; // ✅ 取得當前頁面路徑
+// import { usePathname } from "next/navigation"; // ✅ 取得當前頁面路徑
 // import Navbar from "./Navbar";
 // import Banner from "./Banner";
 import "@/styles/globals.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname(); // ✅ 取得當前路徑
-  const isPricingPage = pathname === "/pricing"; // ✅ 檢查是否為「價格一覽」頁面
+  // const pathname = usePathname(); // ✅ 取得當前路徑
+  // const isPricingPage = pathname === "/pricing"; // ✅ 檢查是否為「價格一覽」頁面
 
   return (
     <html lang="zh-TW">
