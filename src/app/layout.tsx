@@ -1,8 +1,8 @@
 "use client"; // ✅ 讓整個檔案變成 Client Component
 
 import { usePathname } from "next/navigation"; // ✅ 取得當前頁面路徑
-import Navbar from "./Navbar";
-import Banner from "./Banner";
+// import Navbar from "./Navbar";
+// import Banner from "./Banner";
 import "@/styles/globals.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
