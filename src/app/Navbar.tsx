@@ -31,28 +31,25 @@ export default function Navbar() {
   return (
     <header className="bg-white text-gray-900 py-4 fixed top-0 left-0 w-full z-50 shadow-md backdrop-blur-md">
       <div className="max-w-6xl mx-auto flex justify-between items-center px-4">
-        <Link href="/" className="text-lg font-bold">鈞懋動物醫院</Link>
-
         <button className="md:hidden text-2xl" onClick={() => setIsOpen(!isOpen)}>☰</button>
 
         <nav className="hidden md:flex space-x-8 text-lg font-medium">
-          <button onClick={() => handleNavClick("about")} className="hover:text-gray-600">關於我們</button>
-          <button onClick={() => handleNavClick("director")} className="hover:text-gray-600">院長資訊</button>
-          <button onClick={() => handleNavClick("services")} className="hover:text-gray-600">主治項目</button>
-          {/* ✅ 當點擊價格一覽時，自動收起 Navbar */}
-          {/* <Link href="/pricing" className="hover:text-gray-600" onClick={() => setIsOpen(false)}>價格一覽</Link> */}
-          <button onClick={() => handleNavClick("contact")} className="hover:text-gray-600">聯絡方式</button>
+          <button onClick={() => handleNavClick("unboxing")} className="hover:text-gray-600">開箱說明</button>
+          <button onClick={() => handleNavClick("application")} className="hover:text-gray-600">使用說明</button>
+          <button onClick={() => handleNavClick("product")} className="hover:text-gray-600">產品說明</button>
+          <button onClick={() => handleNavClick("notice")} className="hover:text-gray-600">注意事項</button>
+          <button onClick={() => handleNavClick("service")} className="hover:text-gray-600">服務單位</button>
         </nav>
       </div>
 
       {/* ✅ 手機版選單修正 */}
       {isOpen && (
         <nav className="md:hidden bg-gray-100 text-gray-900 py-4 space-y-3 text-center">
-          <button onClick={() => handleNavClick("about")} className="block w-full hover:bg-gray-200 py-2">關於我們</button>
-          <button onClick={() => handleNavClick("director")} className="block w-full hover:bg-gray-200 py-2">院長資訊</button>
-          <button onClick={() => handleNavClick("services")} className="block w-full hover:bg-gray-200 py-2">主治項目</button>
-          <Link href="/pricing" className="block w-full hover:bg-gray-200 py-2" onClick={() => setIsOpen(false)}>價格一覽</Link>
-          <button onClick={() => handleNavClick("contact")} className="block w-full hover:bg-gray-200 py-2">聯絡方式</button>
+          <button onClick={() => handleNavClick("unboxing")} className="hover:text-gray-600">開箱說明</button>
+          <button onClick={() => handleNavClick("application")} className="hover:text-gray-600">使用說明</button>
+          <button onClick={() => handleNavClick("product")} className="hover:text-gray-600">產品說明</button>
+          <button onClick={() => handleNavClick("notice")} className="hover:text-gray-600">注意事項</button>
+          <button onClick={() => handleNavClick("service")} className="hover:text-gray-600">服務單位</button>
         </nav>
       )}
     </header>
