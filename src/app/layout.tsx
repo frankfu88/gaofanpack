@@ -11,7 +11,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body className="bg-white text-gray-900">
-        {/* 🔹 主要內容 */}
         <main className="pt-[100px] px-4">{children}</main>
       </body>
     </html>
