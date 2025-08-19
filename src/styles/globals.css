@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 🔹 讓點擊 Navbar 時滾動更流暢 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 🔹 設定整體背景顏色 */
+body {
+  background-color: #E6D6CC; /* 淺色背景 */
+  color: #3B302A; /* 主要文字顏色 */
+}
+
+/* 🔹 主要區塊樣式 */
+.section-dark {
+  background-color: #9D8575; /* 深色背景 */
+  color: white; /* 讓字體在深色背景可讀 */
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 🔹 主要標題 */
+h1, h2, h3 {
+  color: #5A4032; /* 深咖啡色 */
+}
+
+
+/* 🔹 Navbar 樣式 (統一管理) */
+.navbar {
+  background-color: #E6D6CC; /* 淺色背景 */
+  color: #3B302A; /* 深色文字 */
+  padding: 16px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 50;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+/* 🔹 桌面版選單樣式 */
+.navbar-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.navbar-links a {
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  color: #3B302A; /* 預設深色 */
+}
+
+/* 🔹 滑鼠懸停 Hover 效果 */
+.navbar-links a:hover {
+  background-color: #C9B6A6; /* 深一點的米色 */
+  color: #5A4032; /* 深咖啡色 */
+}
+
+/* 🔹 漢堡選單 (手機版) */
+.mobile-nav {
+  background-color: #E6D6CC; /* 手機選單背景 */
+  padding: 16px 0;
+  text-align: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-nav a {
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  color: #3B302A; /* 預設深色 */
+}
+
+.mobile-nav a:hover {
+  background-color: #C9B6A6; /* 深一點的米色 */
+  color: #5A4032; /* 深咖啡色 */
+}
+
