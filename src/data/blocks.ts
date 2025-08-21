@@ -1,6 +1,13 @@
 // /src/data/blocks.ts
 import { IconType } from "react-icons";
-import { FaBoxOpen, FaPlayCircle, FaExclamationTriangle, FaInfoCircle, FaBuilding } from "react-icons/fa";
+import {
+  FaBoxOpen,
+  FaPlayCircle,
+  FaImages,
+  FaExclamationTriangle,
+  FaInfoCircle,
+  FaBuilding,
+} from "react-icons/fa";
 
 export type VideoSource = { src: string; type?: string };
 
@@ -8,7 +15,7 @@ export type Block =
   | {
       title: string;
       contentType: "video";
-      sources: VideoSource[];   // 改成多來源
+      sources: VideoSource[]; // 依序：480 → 720 → 原檔
       poster?: string;
       description: string;
       icon: IconType;
@@ -27,11 +34,12 @@ export const blocks: Block[] = [
     title: "开箱说明",
     contentType: "video",
     sources: [
+      { src: "/videos/unbox-480.mp4", type: "video/mp4" },
       { src: "/videos/unbox-720.mp4", type: "video/mp4" },
-      { src: "/videos/unbox.mp4",     type: "video/mp4" },
+      { src: "/videos/unbox.mp4", type: "video/mp4" },
     ],
     poster: "/images/posters/unbox.jpg",
-    description: "高反急救包里有哪些物品？请观看此影片。",
+    description: "高反急救包里有哪些物品？请观看此视频。",
     icon: FaBoxOpen,
     gradient: "from-emerald-400 to-teal-500",
   },
@@ -39,13 +47,29 @@ export const blocks: Block[] = [
     title: "使用说明",
     contentType: "video",
     sources: [
+      { src: "/videos/howto-480.mp4", type: "video/mp4" },
       { src: "/videos/howto-720.mp4", type: "video/mp4" },
-      { src: "/videos/howto.mp4",     type: "video/mp4" },
+      { src: "/videos/howto.mp4", type: "video/mp4" },
     ],
     poster: "/images/posters/howto.jpg",
-    description: "如何正确使用高反急救包？请观看此影片。",
+    description: "如何正确使用高反急救包？请观看此视频。",
     icon: FaPlayCircle,
     gradient: "from-sky-400 to-indigo-500",
+  },
+  // ✅ 新增「使用场景」區塊（檔名：scene-480/scene-720/scene.mp4）
+  {
+    title: "使用场景",
+    contentType: "video",
+    sources: [
+      { src: "/videos/scene-480.mp4", type: "video/mp4" },
+      { src: "/videos/scene-720.mp4", type: "video/mp4" },
+      { src: "/videos/scene.mp4", type: "video/mp4" },
+    ],
+    // 若尚未準備海報，可先移除此列
+    poster: "/images/posters/scene.jpg",
+    description: "在什么情况下使用高反急救包？请观看此视频。",
+    icon: FaImages,
+    gradient: "from-cyan-400 to-blue-500",
   },
   {
     title: "注意事项",
