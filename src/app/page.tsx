@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import VideoPlayer from "@/components/VideoPlayer";
 import { blocks } from "@/data/blocks";
 import BubbleGrid from "@/components/BubbleGrid";
 import ModalSheet from "@/components/ModalSheet";
@@ -36,30 +37,34 @@ export default function HighAltitudeKit() {
       <BubbleGrid blocks={blocks} onSelect={setActiveIndex} />
 
       {activeIndex !== null && (
-        <ModalSheet title={blocks[activeIndex].title} onClose={() => setActiveIndex(null)}>
-          {blocks[activeIndex].contentType === "video" ? (
-            <div className="space-y-3">
-              <p className="text-base sm:text-lg text-gray-700">
-                {blocks[activeIndex].description}
-              </p>
-              <div className="w-full">
-                <video
-                  controls
-                  playsInline
-                  preload="metadata"
-                  className="w-full h-auto max-h-[70vh] sm:max-h-[60vh] rounded-lg border border-gray-200 shadow object-contain"
-                >
-                  <source src={blocks[activeIndex].videoSrc} type="video/mp4" />
-                </video>
-              </div>
-            </div>
-          ) : (
-            <ul className="list-disc list-inside space-y-2 text-base sm:text-lg text-gray-700">
-              {blocks[activeIndex].textContent!.map((t, i) => <li key={i}>{t}</li>)}
-            </ul>
-          )}
-        </ModalSheet>
-      )}
+  <ModalSheet title={blocks[activeIndex].title} onClose={() => setActiveIndex(null)}>
+    {blocks[activeIndex].contentType === "video" ? (
+      <>
+        <div className="space-y-3">
+          <p className="text-base sm:text-lg text-gray-700">
+            {blocks[activeIndex].description}
+          </p>
+
+          <VideoPlayer
+            // 這裡改成用 sources / poster
+            sources={(blocks[activeIndex] as Extract<typeof blocks[number], { contentType: "video" }>).sources}
+            poster={(blocks[activeIndex] as Extract<typeof blocks[number], { contentType: "video" }>).poster}
+            className="w-full h-auto rounded-2xl shadow"
+          />
+        </div>
+      </>
+    ) : (
+      <ul className="list-disc list-inside space-y-2 text-base sm:text-lg text-gray-700">
+        {(
+          blocks[activeIndex] as Extract<typeof blocks[number], { contentType: "text" }>
+        ).textContent.map((t, i) => (
+          <li key={i}>{t}</li>
+        ))}
+      </ul>
+    )}
+  </ModalSheet>
+)}
+
     </main>
   );
 }

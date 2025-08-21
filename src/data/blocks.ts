@@ -2,15 +2,35 @@
 import { IconType } from "react-icons";
 import { FaBoxOpen, FaPlayCircle, FaExclamationTriangle, FaInfoCircle, FaBuilding } from "react-icons/fa";
 
+export type VideoSource = { src: string; type?: string };
+
 export type Block =
-  | { title: string; contentType: "video"; videoSrc: string; description: string; icon: IconType; gradient: string }
-  | { title: string; contentType: "text";  textContent: string[];              icon: IconType; gradient: string };
+  | {
+      title: string;
+      contentType: "video";
+      sources: VideoSource[];   // 改成多來源
+      poster?: string;
+      description: string;
+      icon: IconType;
+      gradient: string;
+    }
+  | {
+      title: string;
+      contentType: "text";
+      textContent: string[];
+      icon: IconType;
+      gradient: string;
+    };
 
 export const blocks: Block[] = [
   {
     title: "开箱说明",
     contentType: "video",
-    videoSrc: "/videos/unbox.mp4",
+    sources: [
+      { src: "/videos/unbox-720.mp4", type: "video/mp4" },
+      { src: "/videos/unbox.mp4",     type: "video/mp4" },
+    ],
+    poster: "/images/posters/unbox.jpg",
     description: "高反急救包里有哪些物品？请观看此影片。",
     icon: FaBoxOpen,
     gradient: "from-emerald-400 to-teal-500",
@@ -18,7 +38,11 @@ export const blocks: Block[] = [
   {
     title: "使用说明",
     contentType: "video",
-    videoSrc: "/videos/howto.mp4",
+    sources: [
+      { src: "/videos/howto-720.mp4", type: "video/mp4" },
+      { src: "/videos/howto.mp4",     type: "video/mp4" },
+    ],
+    poster: "/images/posters/howto.jpg",
     description: "如何正确使用高反急救包？请观看此影片。",
     icon: FaPlayCircle,
     gradient: "from-sky-400 to-indigo-500",
@@ -48,9 +72,7 @@ export const blocks: Block[] = [
   {
     title: "服务单位",
     contentType: "text",
-    textContent: [
-      "（相关单位资讯待补充）",
-    ],
+    textContent: ["（相关单位资讯待补充）"],
     icon: FaBuilding,
     gradient: "from-amber-400 to-yellow-500",
   },
