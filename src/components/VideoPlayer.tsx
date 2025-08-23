@@ -8,9 +8,6 @@ type VendorFullscreenVideo = HTMLVideoElement & {
   webkitEnterFullscreen?: () => void;
   webkitRequestFullScreen?: () => void;
   msRequestFullscreen?: () => void;
-  mozRequestFullScreen?: () => void;
-  webkitDisplayingFullscreen?: boolean;
-  x5ExitFullScreen?: () => void;
 };
 
 type Props = {
@@ -40,50 +37,46 @@ export default function VideoPlayer({
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const posterDoneRef = useRef(false);
+  const posterDoneRef = useRef(false); // 只擷取一次
 
   const labels = useMemo(
     () =>
       sources.map((s) => {
         if (s.label) return s.label;
-        const u = s.src.toLowerCase();
+        const u = s.src;
         if (u.includes("-480")) return "480p";
         if (u.includes("-720")) return "720p";
-        if (u.includes("-1080")) return "1080p";
         return "原画质";
       }),
     [sources]
   );
 
   const nonStdInline = {
-    playsInline: true,
     "webkit-playsinline": "true",
     "x5-playsinline": "true",
-    "x5-video-player-type": "h5",
-    "x5-video-player-fullscreen": "false",
-    "x5-video-orientation": "portrait",
-  } as const;
+  } as Record<string, string>;
 
   const current = sources[idx];
 
   const tryFallback = useCallback(
     (reason: string) => {
       if (idx + 1 >= sources.length) {
-        setNote("当前视频源无法播放，请稍后重试或切换网络。");
+        setNote("目前來源無法播放，請稍後重試或切換網路。");
         return;
       }
       const nextIdx = idx + 1;
       setIdx(nextIdx);
-      setNote(`播放异常（${reason}），已切换至：${labels[nextIdx]}`);
+      setNote(`播放異常（${reason}），已自動切換：${labels[nextIdx]}`);
     },
     [idx, labels, sources.length]
   );
 
   const armTimer = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => tryFallback("加载超时"), stallTimeoutMs);
+    timerRef.current = setTimeout(() => tryFallback("載入逾時"), stallTimeoutMs);
   }, [stallTimeoutMs, tryFallback]);
 
+  // 切換來源時重置
   useEffect(() => {
     armTimer();
     setPosterUrl(undefined);
@@ -93,6 +86,7 @@ export default function VideoPlayer({
     };
   }, [armTimer, current?.src]);
 
+  // 事件：成功 or 失敗
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
@@ -101,7 +95,7 @@ export default function VideoPlayer({
       if (timerRef.current) clearTimeout(timerRef.current);
       setNote(null);
     };
-    const onBad = () => tryFallback("播放错误或卡顿");
+    const onBad = () => tryFallback("播放錯誤/停滯");
 
     v.addEventListener("loadeddata", onOK);
     v.addEventListener("canplay", onOK);
@@ -109,7 +103,6 @@ export default function VideoPlayer({
     v.addEventListener("stalled", onBad);
     v.addEventListener("error", onBad);
     v.addEventListener("emptied", onBad);
-    v.addEventListener("waiting", onBad);
 
     return () => {
       v.removeEventListener("loadeddata", onOK);
@@ -118,15 +111,16 @@ export default function VideoPlayer({
       v.removeEventListener("stalled", onBad);
       v.removeEventListener("error", onBad);
       v.removeEventListener("emptied", onBad);
-      v.removeEventListener("waiting", onBad);
     };
   }, [tryFallback]);
 
+  // 用第一幀（實際上 0.2s）當封面
   useEffect(() => {
     if (!posterFromFirstFrame) return;
     const v = videoRef.current;
     if (!v) return;
 
+    // 將某一幀畫到 canvas 並回傳 base64
     const capture = () => {
       if (posterDoneRef.current) return;
       if (v.videoWidth === 0 || v.videoHeight === 0) return;
@@ -139,14 +133,15 @@ export default function VideoPlayer({
         if (!ctx) return;
 
         ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
-        const url = canvas.toDataURL("image/jpeg", 0.7);
-        setPosterUrl(url);
+        const url = canvas.toDataURL("image/jpeg", 0.8);
+        setPosterUrl(url);          // 用 state 綁定 poster，瀏覽器會立即更新
         posterDoneRef.current = true;
       } catch {
-        // 跨域問題或瀏覽器限制，直接略過
+        // 若為跨網域且無 CORS，會失敗；此時只能不顯示 poster（或改用靜態圖）
       }
     };
 
+    // 策略：loadedmetadata 後先 seek 到 0.2s，等 seeked 再擷取，避免黑幀
     const onMeta = () => {
       if (posterDoneRef.current) return;
       const t = Math.min(0.2, Math.max(0.05, (v.duration || 1) * 0.01));
@@ -158,11 +153,13 @@ export default function VideoPlayer({
       try {
         v.currentTime = t;
       } catch {
+        // 有些瀏覽器不允許立即 seek，退回 loadeddata 擷取
         v.removeEventListener("seeked", seekAndGrab);
         capture();
       }
     };
 
+    // 後備：若 metadata 已就緒，直接觸發；否則等事件
     if (v.readyState >= 1) {
       onMeta();
     } else {
@@ -171,11 +168,10 @@ export default function VideoPlayer({
     }
   }, [posterFromFirstFrame, current?.src]);
 
+  // 手機自動全螢幕（手勢觸發 play）
   const isMobile = () => {
     if (typeof window === "undefined") return false;
-    const byUA = /iPhone|iPad|iPod|Android|UCBrowser|QQBrowser|SogouMobileBrowser|Baidu/i.test(
-      navigator.userAgent || ""
-    );
+    const byUA = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || "");
     const byWidth = window.matchMedia?.("(max-width: 639px)").matches ?? false;
     return byUA || byWidth;
   };
@@ -188,29 +184,11 @@ export default function VideoPlayer({
     const handlePlay = async () => {
       if (!isMobile()) return;
       try {
-        if (typeof v.webkitEnterFullscreen === "function") {
-          v.webkitEnterFullscreen();
-          return;
-        }
-        if (document.fullscreenElement == null && typeof v.requestFullscreen === "function") {
-          await v.requestFullscreen();
-          return;
-        }
-        if (typeof v.webkitRequestFullScreen === "function") {
-          v.webkitRequestFullScreen();
-          return;
-        }
-        if (typeof v.msRequestFullscreen === "function") {
-          v.msRequestFullscreen();
-          return;
-        }
-        if (typeof v.mozRequestFullScreen === "function") {
-          v.mozRequestFullScreen();
-          return;
-        }
-      } catch {
-        // 忽略全螢幕失敗
-      }
+        if (typeof v.webkitEnterFullscreen === "function") { v.webkitEnterFullscreen(); return; }
+        if (document.fullscreenElement == null && typeof v.requestFullscreen === "function") { await v.requestFullscreen(); return; }
+        if (typeof v.webkitRequestFullScreen === "function") { v.webkitRequestFullScreen(); return; }
+        if (typeof v.msRequestFullscreen === "function") { v.msRequestFullscreen(); return; }
+      } catch { /* ignore */ }
     };
 
     v.addEventListener("play", handlePlay);
@@ -229,13 +207,7 @@ export default function VideoPlayer({
       if (v) {
         const wasPlaying = !v.paused;
         v.load();
-        if (wasPlaying) {
-          setTimeout(() => {
-            void v.play().catch(() => {
-              setNote("播放失败，请手动点击播放");
-            });
-          }, 100);
-        }
+        if (wasPlaying) void v.play().catch(() => {});
       }
     },
     [idx]
@@ -250,8 +222,9 @@ export default function VideoPlayer({
         ref={videoRef}
         controls
         preload="metadata"
-        {...nonStdInline}
+        playsInline
         {...(useCrossOriginForPoster ? { crossOrigin: "anonymous" as const } : {})}
+        {...nonStdInline}
         poster={posterUrl}
         className={["w-full rounded-lg shadow", className].filter(Boolean).join(" ")}
         style={{ touchAction: "manipulation" }}
@@ -259,14 +232,8 @@ export default function VideoPlayer({
         onTouchMove={(e) => e.stopPropagation()}
         onTouchEnd={(e) => e.stopPropagation()}
       >
-        {sources.map((source, i) => (
-          <source
-            key={i}
-            src={source.src}
-            type={source.type ?? "video/mp4"}
-          />
-        ))}
-        您的浏览器不支持 HTML5 视频播放。
+        <source src={current.src} type={current.type ?? "video/mp4"} />
+        您的瀏覽器不支援 HTML5 影片。
       </video>
 
       {note && <p className="mt-2 text-sm text-amber-700">{note}</p>}
