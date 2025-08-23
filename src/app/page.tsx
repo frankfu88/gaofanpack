@@ -1,4 +1,3 @@
-// /src/app/page.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import VideoPlayer from "@/components/VideoPlayer";
@@ -40,14 +39,18 @@ export default function HighAltitudeKit() {
           {(() => {
             const b = blocks[activeIndex];
             if (b.contentType === "video") {
+              // 只使用原画质视频
+              const originalQualitySource = b.sources.find(source => 
+                !source.src.includes("-480") && !source.src.includes("-720")
+              ) || b.sources[0]; // 如果没有找到原画质，使用第一个源
+              
               return (
                 <>
                   <p className="text-base sm:text-lg text-gray-700 mb-3">{b.description}</p>
                   <VideoPlayer
-                    sources={b.sources}
+                    source={originalQualitySource}
                     className="w-full rounded-xl shadow"
-                    showQualitySelector
-                    autoFullscreenOnMobile   // ✅ 手機按播放即原生全螢幕
+                    autoFullscreenOnMobile
                   />
                 </>
               );
